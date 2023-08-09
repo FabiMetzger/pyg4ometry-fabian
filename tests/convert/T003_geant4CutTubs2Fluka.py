@@ -5,6 +5,7 @@ import pyg4ometry.gdml as _gd
 import pyg4ometry.convert as _convert
 import pyg4ometry.fluka as _fluka
 import pyg4ometry.visualisation as _vi
+import pyg4ometry.misc as _mi
 import filecmp as _fc
 
 
@@ -69,15 +70,16 @@ def Test(vis=True, interactive=False, fluka=True, outputPath=None, refFilePath=N
     w.write(outputPath / "T003_geant4CutTubs2Fluka.gdml")
 
     # fluka conversion
+    outputFile = outputPath / "T003_geant4CutTubs2Fluka.inp"
     if fluka:
         freg = _convert.geant4Reg2FlukaReg(reg)
         w = _fluka.Writer()
         w.addDetector(freg)
-        w.write(outputPath / "T003_geant4CutTubs2Fluka.inp")
+        w.write(outputFile)
 
-    # flair output file
-    f = _fluka.Flair("T003_geant4CutTubs2Fluka.inp", extentBB)
-    f.write(outputPath / "T003_geant4CutTubs2Fluka.flair")
+    # flair output file (TODO put back)
+    # f = _fluka.Flair("T003_geant4CutTubs2Fluka.inp", extentBB)
+    # f.write(outputPath / "T003_geant4CutTubs2Fluka.flair")
 
     if vis:
         v = _vi.VtkViewer()
@@ -85,7 +87,10 @@ def Test(vis=True, interactive=False, fluka=True, outputPath=None, refFilePath=N
         v.view(interactive=interactive)
 
     if refFilePath is not None:
-        assert _fc.cmp(refFilePath, outputPath / "T003_geant4CutTubs2Fluka.inp", shallow=False)
+        diff = _fc.cmp(refFilePath, outputFile, shallow=False)
+        if diff:
+            _mi.diffFiles(refFilePath, outputFile)
+        assert diff
 
     return {"greg": reg, "freg": freg}
 

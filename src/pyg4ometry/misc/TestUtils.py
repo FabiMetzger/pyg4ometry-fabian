@@ -12,7 +12,7 @@ def md5_file(fname):
 
 def diffFiles(file1, file2):
     with open(file1) as f1, open(file2) as f2:
-        diff = _dl.unified_diff(f1.readlines(), f2.readlines(), fromfile=file1, tofile=file2)
+        diff = _dl.unified_diff(f1.readlines(), f2.readlines())
 
         for line in diff:
             print(line)

@@ -70,9 +70,9 @@ def Test(vis=False, interactive=False, fluka=True, outputPath=None, refFilePath=
         w.addDetector(freg)
         w.write(outputFile)
 
-    # flair output file
-    f = _fluka.Flair(outputFile, extentBB)
-    f.write(outputPath / "T001_geant4Box2Fluka.flair")
+    # flair output file (TODO put back)
+    # f = _fluka.Flair(outputFile, extentBB)
+    # f.write(str(outputPath / "T001_geant4Box2Fluka.flair"))
 
     if vis:
         v = _vi.VtkViewer()
@@ -84,6 +84,7 @@ def Test(vis=False, interactive=False, fluka=True, outputPath=None, refFilePath=
         diff = _fc.cmp(refFilePath, outputFile, shallow=False)
         if diff:
             _mi.diffFiles(refFilePath, outputFile)
+        assert diff
 
     return {"greg": reg, "freg": freg}
 
