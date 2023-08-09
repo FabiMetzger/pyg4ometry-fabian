@@ -6,7 +6,6 @@ import pyg4ometry.convert as _convert
 import pyg4ometry.fluka as _fluka
 import pyg4ometry.visualisation as _vi
 import pyg4ometry.misc as _mi
-import filecmp as _fc
 
 
 def Test(vis=True, interactive=False, fluka=True, outputPath=None, refFilePath=None):
@@ -77,20 +76,16 @@ def Test(vis=True, interactive=False, fluka=True, outputPath=None, refFilePath=N
         w.addDetector(freg)
         w.write(outputFile)
 
-    # flair output file (TODO put back)
-    # f = _fluka.Flair("T003_geant4CutTubs2Fluka.inp", extentBB)
-    # f.write(outputPath / "T003_geant4CutTubs2Fluka.flair")
+    # flair output file
+    f = _fluka.Flair("T003_geant4CutTubs2Fluka.inp", extentBB)
+    f.write(outputPath / "T003_geant4CutTubs2Fluka.flair")
 
     if vis:
         v = _vi.VtkViewer()
         v.addLogicalVolume(wl)
         v.view(interactive=interactive)
 
-    if refFilePath is not None:
-        diff = _fc.cmp(refFilePath, outputFile, shallow=False)
-        if diff:
-            _mi.diffFiles(refFilePath, outputFile)
-        assert diff
+    _mi.compareFilesWithAssert(refFilePath, outputFile)
 
     return {"greg": reg, "freg": freg}
 
