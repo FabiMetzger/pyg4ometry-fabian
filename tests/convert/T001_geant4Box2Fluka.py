@@ -16,7 +16,7 @@ def Test(vis=False, interactive=False, fluka=True, outputPath=None, refFilePath=
     reg = _g4.Registry()
 
     # solids
-    ws = _g4.solid.Box("ws", 1000, 1000, 1000, reg, "mm")
+    ws = _g4.solid.Box("ws", 1001, 1000, 1000, reg, "mm")
     b1s = _g4.solid.Box("b1s", 50, 75, 100, reg, "mm")
     b2s = _g4.solid.Box("b2s", 5, 10, 15, reg, "mm")
 
