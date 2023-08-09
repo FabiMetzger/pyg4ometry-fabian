@@ -24,7 +24,9 @@ def diffFiles(file1, file2):
 
 
 def compareFilesWithAssert(file1, file2):
+    print("compare")
     if file1 is not None and file2 is not None:
         diff = _fc.cmp(file1, file2, shallow=False)
+        print("compare", diff)
         if diff:
             assert diffFiles(file1, file2)
