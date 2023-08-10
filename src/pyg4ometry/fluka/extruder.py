@@ -22,6 +22,8 @@ class Extruder(pyg4ometry.geant4.solid.SolidBase):
         self.decomposed = {}
         self.g4_extrusions = {}
         self.g4_decomposed_extrusions = {}
+        self.g4_logicals = {}
+        self.g4_decomposed_logicals = {}
 
     def addRegion(self, name):
         self.regions[name] = []
@@ -79,6 +81,49 @@ class Extruder(pyg4ometry.geant4.solid.SolidBase):
                 g4_decomposed_extrusions.append(g4e)
 
             self.g4_decomposed_extrusions[region] = g4_decomposed_extrusions
+    
+    def buildGeant4LogicalVolumes(self, materialDict):
+        for name, solid in self.g4_extrusions.items():
+            self.g4_logicals[name] = pyg4ometry.geant4.LogicalVolume(
+                solid, materialDict[name], name + 'Logical', self.registry
+            )
+
+        for name, solid in self.g4_decomposed_extrusions.items():
+            self.g4_decomposed_logicals[name] = pyg4ometry.geant4.LogicalVolume(
+                solid, materialDict[name], name + 'DecomposedLogical', self.registry
+            )
+
+        self.registry.setWorld(self.g4_decomposed_logicals[self.boundary])
+
+    def buildGeant4PhysicalVolumes(self, transformationDict = None):
+        if transformationDict:
+            for name, logical in self.g4_logicals.items():
+                pyg4ometry.geant4.PhysicalVolume(
+                    transformationDict[name][0], transformationDict[name][1], logical,
+                    name + 'Physical', self.registry.getWorldVolume(),
+                )
+            
+            for name, logical in self.g4_decomposed_logicals.items():
+                if name != self.boundary:
+                    pyg4ometry.geant4.PhysicalVolume(
+                    transformationDict[name][0], transformationDict[name][1], logical,
+                    name + 'DecomposedPhysical', self.registry.getWorldVolume(),
+                )
+        else:
+            '''
+            for name, logical in self.g4_logicals.items():
+                pyg4ometry.geant4.PhysicalVolume(
+                    [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], logical,
+                    name + 'Physical', self.registry.getWorldVolume(),
+                )
+            '''
+            
+            for name, logical in self.g4_decomposed_logicals.items():
+                if name != self.boundary:
+                    pyg4ometry.geant4.PhysicalVolume(
+                    [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], logical,
+                    name + 'DecomposedPhysical', self.registry.getWorldVolume(),
+                )
 
     def plot(self, decompositions=False):
         f = _plt.figure()
